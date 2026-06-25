@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyFlow Habit Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --orange: #f5a623;
+  --orange-dark: #e8960f;
+  --sidebar-bg: #1a1a2e;
+  --sidebar-active: #2a2a40;
+  --bg: #f0f2f7;
+  --white: #fff;
+  --text-dark: #1a1a2e;
+  --text-gray: #6b7280;
+  --card-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  --green: #22c55e;
+  --red: #ef4444;
+}
+
+body { font-family: 'Manrope', sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+
+/* SIDEBAR */
+.sidebar { width: 260px; min-width: 260px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; }
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 22px 24px; font-size: 18px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.07); text-decoration: none; color: white; }
+.logo-icon { width: 34px; height: 34px; background: var(--orange); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+.nav-menu { list-style: none; padding: 18px 12px; flex: 1; }
+.nav-menu li { margin-bottom: 4px; }
+.nav-menu li a { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; text-decoration: none; color: rgba(255,255,255,0.65); font-size: 14px; font-weight: 600; transition: 0.2s; }
+.nav-menu li a:hover { background: rgba(255,255,255,0.08); color: white; }
+.nav-menu li.active a { background: var(--sidebar-active); color: var(--orange); border-left: 3px solid var(--orange); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid rgba(255,255,255,0.07); }
+.logout-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); padding: 10px 16px; border-radius: 10px; width: 100%; font-family: 'Manrope',sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+.logout-btn:hover { background: rgba(255,80,80,0.15); color: #ff6b6b; }
+
+/* MAIN */
+.main { flex: 1; overflow-y: auto; padding: 30px 36px; }
+
+/* HEADER */
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+.page-header h1 { font-size: 26px; font-weight: 800; }
+.page-header p { color: var(--text-gray); font-size: 14px; margin-top: 4px; }
+.clock-box { background: var(--sidebar-bg); color: white; padding: 12px 20px; border-radius: 12px; font-size: 18px; font-weight: 700; }
+
+/* STATS */
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: var(--white); border-radius: 14px; padding: 20px 22px; box-shadow: var(--card-shadow); position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--orange); border-radius: 14px 14px 0 0; }
+.stat-card h4 { color: var(--text-gray); font-size: 13px; margin-bottom: 10px; }
+.stat-card h1 { font-size: 36px; font-weight: 800; color: var(--text-dark); }
+
+/* ADD BOX */
+.add-box { background: var(--white); padding: 20px 24px; border-radius: 14px; margin-bottom: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; box-shadow: var(--card-shadow); }
+.add-box input[type=text] { flex: 1; min-width: 220px; padding: 12px 16px; border-radius: 10px; border: 1.5px solid #e5e7eb; font-family: 'Manrope', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+.add-box input[type=text]:focus { border-color: var(--orange); }
+.add-box input[type=color] { width: 50px; height: 44px; border: none; background: none; cursor: pointer; border-radius: 8px; }
+.add-box button { border: none; background: var(--orange); color: white; font-weight: 700; padding: 12px 24px; border-radius: 10px; cursor: pointer; font-family: 'Manrope', sans-serif; font-size: 14px; transition: background 0.2s; }
+.add-box button:hover { background: var(--orange-dark); }
+
+/* LAYOUT */
+.layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+
+/* TABLE */
+.sheet { background: var(--white); border-radius: 16px; overflow: hidden; box-shadow: var(--card-shadow); }
+.sheet-header { padding: 20px 24px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.sheet-header h2 { font-size: 16px; font-weight: 800; }
+.week-nav { display: flex; align-items: center; gap: 10px; }
+.week-nav button { width: 36px; height: 36px; border: none; border-radius: 10px; background: var(--orange); color: white; font-size: 16px; font-weight: 700; cursor: pointer; }
+#weekLabel { font-weight: 700; color: var(--text-dark); font-size: 14px; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 14px 16px; border-bottom: 1px solid #f3f4f6; text-align: center; font-size: 13px; }
+th { background: #fffbf0; color: var(--text-dark); font-weight: 700; position: sticky; top: 0; z-index: 1; }
+th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: white; z-index: 2; }
+.today-col { background: #fff8e6 !important; }
+
+.habit-name-cell { display: flex; align-items: center; gap: 10px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+.check { width: 34px; height: 34px; border-radius: 10px; border: 2px solid #d1d5db; display: flex; align-items: center; justify-content: center; margin: auto; transition: 0.2s; cursor: pointer; font-weight: 700; font-size: 14px; }
+.check.done { color: white; }
+.check.locked { opacity: 0.5; cursor: not-allowed; }
+.check.future { opacity: 0.3; cursor: not-allowed; }
+
+.delete-btn-small { margin-left: auto; width: 30px; height: 30px; border: none; border-radius: 8px; background: #fee2e2; color: var(--red); cursor: pointer; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+
+/* SIDEBAR PANELS */
+.side-panels { display: flex; flex-direction: column; gap: 16px; }
+.panel { background: var(--white); border-radius: 14px; padding: 20px; box-shadow: var(--card-shadow); }
+.panel h3 { font-size: 15px; font-weight: 800; margin-bottom: 16px; }
+
+.streak-item { margin-bottom: 14px; }
+.streak-top { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+.streak-bar { width: 100%; height: 8px; background: #f3f4f6; border-radius: 10px; overflow: hidden; }
+.streak-bar div { height: 100%; border-radius: 10px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 30px; right: 30px; background: #22c55e; color: white; padding: 12px 22px; border-radius: 12px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 9999; }
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* RESPONSIVE */
+@media(max-width:1100px) { .layout { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:700px) { body { flex-direction: column; overflow: auto; height: auto; } .sidebar { width: 100%; min-width: 100%; } .main { padding: 20px 16px; } .stats { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <a class="sidebar-logo" href="{{ url_for('home') }}">
+    <div class="logo-icon">🔥</div> StudyFlow
+  </a>
+  <ul class="nav-menu">
+    <li><a href="{{ url_for('dashboard') }}"><span class="nav-icon">⊞</span> Dashboard</a></li>
+    <li><a href="{{ url_for('pomodoro') }}"><span class="nav-icon">⏱</span> Pomodoro</a></li>
+    <li><a href="{{ url_for('todo') }}"><span class="nav-icon">☑</span> To-Do</a></li>
+    <li><a href="{{ url_for('timetable') }}"><span class="nav-icon">📅</span> Timetable</a></li>
+    <li class="active"><a href="{{ url_for('habits') }}"><span class="nav-icon">🔥</span> Habits</a></li>
+    <li><a href="{{ url_for('profile') }}"><span class="nav-icon">👤</span> Profile</a></li>
+  </ul>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="page-header">
+    <div>
+      <h1>🔥 Habit Tracker</h1>
+      <p>Build streaks, stay consistent, achieve goals.</p>
+    </div>
+    <div class="clock-box" id="clock">--:--:--</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card"><h4>Today's Progress</h4><h1 id="todayStat">0%</h1></div>
+    <div class="stat-card"><h4>Weekly Progress</h4><h1 id="weekStat">0%</h1></div>
+    <div class="stat-card"><h4>Total Habits</h4><h1 id="habitStat">0</h1></div>
+    <div class="stat-card"><h4>Best Streak</h4><h1 id="streakStat">0🔥</h1></div>
+  </div>
+
+  <!-- ADD HABIT -->
+  <div class="add-box">
+    <input type="text" id="habitInput" placeholder="Enter habit name e.g. Read for 30 mins">
+    <input type="color" id="habitColor" value="#f5a623">
+    <button onclick="addHabit()">+ Add Habit</button>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="layout">
+
+    <!-- TABLE -->
+    <div class="sheet">
+      <div class="sheet-header">
+        <h2>📅 Weekly Spreadsheet</h2>
+        <div class="week-nav">
+          <button onclick="changeWeek(-1)">←</button>
+          <span id="weekLabel"></span>
+          <button onclick="changeWeek(1)">→</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr id="thead"><th>Habit</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SIDE PANELS -->
+    <div class="side-panels">
+      <div class="panel">
+        <h3>📊 Weekly Progress</h3>
+        <canvas id="weeklyChart"></canvas>
+      </div>
+      <div class="panel">
+        <h3>🗓️ Monthly Progress</h3>
+        <canvas id="monthlyChart"></canvas>
+      </div>
+      <div class="panel">
+        <h3>🔥 Habit Streaks</h3>
+        <div id="streakList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Saved!</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCK339IcGf7kR6zegZUAz93GaCHbDTVbsI",
+  authDomain: "smart-study-planner-6bc26.firebaseapp.com",
+  projectId: "smart-study-planner-6bc26",
+  storageBucket: "smart-study-planner-6bc26.firebasestorage.app",
+  messagingSenderId: "536615775632",
+  appId: "1:536615775632:web:15f704b6c9d60a68435715"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = "/"; return; }
+  await fetch("/api/set_user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ uid: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email })
+  });
+  await loadAll();
+});
+
+window.logout = function(){
+  signOut(auth).then(() => { window.location.href = "/"; });
+};
+
+// ── Data ──────────────────────────────────────────────────────
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let habits   = [];
+let allLogs  = {};   // key: "habitId_date" => true
+let weekOffset = 0;
+let weeklyChart, monthlyChart;
+
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+
+function dateKey(d){ return d.toISOString().split('T')[0]; }
+
+// ── Load habits + logs ────────────────────────────────────────
+async function loadAll(){
+  try {
+    const [hRes, lRes] = await Promise.all([
+      fetch("/api/habits"),
+      fetch("/api/habits/all_logs")
+    ]);
+    habits  = await hRes.json();
+    allLogs = await lRes.json();
+    render();
+  } catch(e){ console.error(e); }
+}
+
+// ── Add habit ─────────────────────────────────────────────────
+window.addHabit = async function(){
+  const name  = document.getElementById('habitInput').value.trim();
+  const color = document.getElementById('habitColor').value;
+  if(!name) return;
+  await fetch("/api/habits/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, color })
+  });
+  document.getElementById('habitInput').value = '';
+  showToast('✅ Habit added!');
+  await loadAll();
+};
+
+// ── Toggle habit check ────────────────────────────────────────
+window.toggleHabit = async function(id, key){
+  const today   = todayStr();
+  const clicked = new Date(key);
+  const now     = new Date(today);
+  clicked.setHours(0,0,0,0); now.setHours(0,0,0,0);
+
+  if(clicked > now) return; // future — block
+
+  const logKey = `${id}_${key}`;
+  const isDone = allLogs[logKey];
+
+  if(isDone && key !== today) return; // locked past day
+
+  if(isDone){
+    // uncheck
+    await fetch(`/api/habits/uncheck/${id}`, { method: 'POST' });
+    delete allLogs[logKey];
+  } else {
+    // check
+    await fetch(`/api/habits/check/${id}`, { method: 'POST' });
+    allLogs[logKey] = true;
+  }
+
+  // Refresh habits for updated streaks
+  const res = await fetch("/api/habits");
+  habits    = await res.json();
+  render();
+};
+
+// ── Delete habit ──────────────────────────────────────────────
+window.deleteHabit = async function(id){
+  if(!confirm("Delete this habit?")) return;
+  await fetch(`/api/habits/delete/${id}`, { method: 'DELETE' });
+  showToast('🗑️ Habit deleted!');
+  await loadAll();
+};
+
+// ── Week dates ────────────────────────────────────────────────
+function getWeekDates(){
+  const now  = new Date();
+  const day  = now.getDay();
+  const sun  = new Date(now);
+  sun.setDate(now.getDate() - day + (weekOffset * 7));
+  return Array.from({length:7}, (_,i) => { const d=new Date(sun); d.setDate(sun.getDate()+i); return d; });
+}
+
+function changeWeek(n){ weekOffset += n; render(); }
+
+// ── Render ────────────────────────────────────────────────────
+function render(){
+  renderTable();
+  updateStats();
+  updateWeekLabel();
+  renderWeeklyChart();
+  renderMonthlyChart();
+  renderStreaks();
+}
+
+function renderTable(){
+  const dates = getWeekDates();
+  const today = todayStr();
+
+  // Header
+  const thead = document.getElementById('thead');
+  thead.innerHTML = '<th>Habit</th>';
+  dates.forEach(d => {
+    const isToday = dateKey(d) === today;
+    thead.innerHTML += `<th class="${isToday?'today-col':''}">${d.toLocaleDateString('en-US',{month:'short'})} ${d.getDate()}<br>${DAYS[d.getDay()]}</th>`;
+  });
+  thead.innerHTML += '<th>%</th>';
+
+  // Body
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  habits.forEach(h => {
+    let doneCount = 0;
+    let row = `<tr><td><div class="habit-name-cell"><div class="dot" style="background:${h.color}"></div><span>${h.name}</span><button class="delete-btn-small" onclick="deleteHabit(${h.id})">✕</button></div></td>`;
+
+    dates.forEach(d => {
+      const key    = dateKey(d);
+      const logKey = `${h.id}_${key}`;
+      const done   = !!allLogs[logKey];
+      const isFuture = new Date(key) > new Date(today);
+      const locked = done && key !== today;
+      const isToday = key === today;
+      if(done) doneCount++;
+
+      row += `<td class="${isToday?'today-col':''}">
+        <div class="check ${done?'done':''} ${isFuture?'future':''} ${locked?'locked':''}"
+             onclick="toggleHabit(${h.id},'${key}')"
+             style="background:${done?h.color:'transparent'};border-color:${done?h.color:'#d1d5db'}">
+          ${done?'✓':''}
+        </div>
+      </td>`;
+    });
+
+    const pct = Math.round((doneCount/7)*100);
+    row += `<td><b>${pct}%</b></td></tr>`;
+    tbody.innerHTML += row;
+  });
+
+  if(habits.length === 0){
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#9ca3af;">No habits yet. Add your first habit above!</td></tr>';
+  }
+}
+
+function updateStats(){
+  const today = todayStr();
+  const dates = getWeekDates();
+
+  // Today's progress
+  const todayDone = habits.filter(h => allLogs[`${h.id}_${today}`]).length;
+  const todayPct  = habits.length ? Math.round((todayDone/habits.length)*100) : 0;
+  document.getElementById('todayStat').textContent = todayPct + '%';
+
+  // Weekly progress
+  let wTotal=0, wDone=0;
+  dates.forEach(d => {
+    habits.forEach(h => {
+      wTotal++;
+      if(allLogs[`${h.id}_${dateKey(d)}`]) wDone++;
+    });
+  });
+  document.getElementById('weekStat').textContent = wTotal ? Math.round((wDone/wTotal)*100)+'%' : '0%';
+
+  // Total habits
+  document.getElementById('habitStat').textContent = habits.length;
+
+  // Best streak
+  const best = habits.reduce((max,h) => Math.max(max, h.streak), 0);
+  document.getElementById('streakStat').textContent = best + '🔥';
+}
+
+function updateWeekLabel(){
+  const dates = getWeekDates();
+  const fmt   = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  document.getElementById('weekLabel').textContent = `${fmt(dates[0])} - ${fmt(dates[6])}`;
+}
+
+function renderWeeklyChart(){
+  const dates  = getWeekDates();
+  const labels = dates.map(d => DAYS[d.getDay()]);
+  const values = dates.map(d => {
+    const done = habits.filter(h => allLogs[`${h.id}_${dateKey(d)}`]).length;
+    return habits.length ? Math.round((done/habits.length)*100) : 0;
+  });
+  const ctx = document.getElementById('weeklyChart');
+  if(weeklyChart) weeklyChart.destroy();
+  weeklyChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ data: values, borderColor: '#f5a623', backgroundColor: 'rgba(245,166,35,0.15)', fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4 }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } }
+  });
+}
+
+function renderMonthlyChart(){
+  const now    = new Date();
+  const days   = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const labels = Array.from({length:days},(_,i)=>i+1);
+  const values = labels.map(day => {
+    const d   = new Date(now.getFullYear(), now.getMonth(), day);
+    const key = dateKey(d);
+    const done = habits.filter(h => allLogs[`${h.id}_${key}`]).length;
+    return habits.length ? Math.round((done/habits.length)*100) : 0;
+  });
+  const ctx = document.getElementById('monthlyChart');
+  if(monthlyChart) monthlyChart.destroy();
+  monthlyChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: values, backgroundColor: '#1a1a2e', borderRadius: 4 }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } }
+  });
+}
+
+function renderStreaks(){
+  const list = document.getElementById('streakList');
+  if(!habits.length){ list.innerHTML = '<p style="color:#9ca3af;font-size:14px;">No habits yet.</p>'; return; }
+  list.innerHTML = habits.map(h => `
+    <div class="streak-item">
+      <div class="streak-top">
+        <span>${h.name}</span>
+        <b>${h.streak}d 🔥</b>
+      </div>
+      <div class="streak-bar">
+        <div style="width:${Math.min(h.streak*10,100)}%;background:${h.color}"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Clock ─────────────────────────────────────────────────────
+setInterval(() => {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+}, 1000);
+document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+
+// ── Toast ─────────────────────────────────────────────────────
+function showToast(msg='✅ Saved!'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+</script>
+</body>
+</html>

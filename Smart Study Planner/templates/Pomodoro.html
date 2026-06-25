@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomodoro - StudyFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --orange: #f5a623;
+  --orange-dark: #e8960f;
+  --sidebar-bg: #1a1a2e;
+  --sidebar-active: #2a2a40;
+  --bg: #f0f2f7;
+  --white: #fff;
+  --text-dark: #1a1a2e;
+  --text-gray: #6b7280;
+  --card-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px; min-width: 260px;
+  background: var(--sidebar-bg);
+  color: white; display: flex; flex-direction: column;
+}
+
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 22px 24px; font-size: 18px; font-weight: 800;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  text-decoration: none; color: white;
+}
+
+.logo-icon {
+  width: 34px; height: 34px; background: var(--orange);
+  border-radius: 9px; display: flex; align-items: center; justify-content: center;
+}
+
+.nav-menu { list-style: none; padding: 18px 12px; flex: 1; }
+.nav-menu li { margin-bottom: 4px; }
+
+.nav-menu li a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 10px;
+  text-decoration: none; color: rgba(255,255,255,0.65);
+  font-size: 14px; font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav-menu li a:hover { background: rgba(255,255,255,0.08); color: white; }
+.nav-menu li.active a { background: var(--sidebar-active); color: var(--orange); border-left: 3px solid var(--orange); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+.sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid rgba(255,255,255,0.07); }
+
+.logout-btn {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6); padding: 10px 16px; border-radius: 10px; width: 100%;
+  font-family: 'Manrope',sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; text-align: left; transition: background 0.2s, color 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.logout-btn:hover { background: rgba(255,80,80,0.15); color: #ff6b6b; border-color: rgba(255,80,80,0.2); }
+
+/* MAIN */
+.main { flex: 1; overflow-y: auto; padding: 36px 40px; }
+
+.page-title { font-size: 26px; font-weight: 800; color: var(--text-dark); margin-bottom: 28px; }
+
+.content-grid {
+  display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start;
+}
+
+/* CARD */
+.card {
+  background: var(--white); border-radius: 20px;
+  padding: 36px; box-shadow: var(--card-shadow);
+}
+
+.input {
+  width: 100%; padding: 12px 16px; border-radius: 10px;
+  border: 1.5px solid #e5e7eb; font-family: 'Manrope', sans-serif;
+  font-size: 14px; outline: none; transition: border-color 0.2s;
+  margin-bottom: 16px;
+}
+.input:focus { border-color: var(--orange); }
+
+.input-row { display: flex; gap: 10px; margin-bottom: 8px; }
+.input-row .input { margin-bottom: 0; }
+
+.time-label {
+  display: flex; gap: 10px; font-size: 11px;
+  color: var(--text-gray); margin-bottom: 16px;
+}
+.time-label span { flex: 1; text-align: center; }
+
+/* PROGRESS BAR */
+.progress-bar {
+  width: 100%; height: 8px; background: #f3f4f6;
+  border-radius: 99px; overflow: hidden; margin-bottom: 8px;
+}
+.progress-fill {
+  height: 100%; background: var(--orange);
+  width: 100%; transition: width 0.5s linear;
+}
+
+/* TIMER */
+.timer {
+  font-size: 72px; text-align: center; font-weight: 800;
+  color: var(--text-dark); letter-spacing: 2px;
+  margin: 20px 0;
+}
+
+/* BUTTONS */
+.buttons { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
+
+.btn {
+  padding: 11px 22px; border: none; border-radius: 10px;
+  cursor: pointer; font-family: 'Manrope', sans-serif;
+  font-size: 14px; font-weight: 700; transition: 0.2s;
+}
+.btn-start { background: var(--orange); color: white; }
+.btn-start:hover { background: var(--orange-dark); }
+.btn-reset { background: #f3f4f6; color: var(--text-dark); }
+.btn-reset:hover { background: #e5e7eb; }
+.btn-focus { background: var(--sidebar-bg); color: white; }
+.btn-focus:hover { background: #2a2a40; }
+
+/* STATS */
+.stats { display: flex; gap: 12px; margin-bottom: 24px; }
+.stat-box {
+  flex: 1; background: #f9fafb; padding: 16px;
+  border-radius: 12px; text-align: center; border: 1px solid #e5e7eb;
+}
+.stat-box span { font-size: 12px; color: var(--text-gray); font-weight: 600; }
+.stat-box h3 { margin-top: 6px; font-size: 24px; font-weight: 800; }
+
+/* SOUND */
+.sound-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.sound-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+
+.sound-btn {
+  padding: 12px; border-radius: 10px; border: 1.5px solid #e5e7eb;
+  background: #f9fafb; cursor: pointer; font-family: 'Manrope', sans-serif;
+  font-size: 13px; font-weight: 600; transition: 0.2s;
+}
+.sound-btn:hover { border-color: var(--orange); }
+.sound-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
+
+.upload-area { display: flex; align-items: center; gap: 12px; }
+.upload-btn {
+  background: var(--sidebar-bg); color: white;
+  padding: 10px 16px; border-radius: 10px; cursor: pointer;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600;
+}
+#audio-name { font-size: 13px; color: var(--text-gray); }
+
+/* HISTORY PANEL */
+.history-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+
+.history-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid #f3f4f6;
+}
+.history-item:last-child { border-bottom: none; }
+.history-subject { font-size: 14px; font-weight: 700; }
+.history-meta { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
+.history-duration {
+  background: #fff3e0; color: var(--orange);
+  font-size: 12px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px;
+}
+
+.empty-history { color: var(--text-gray); font-size: 14px; text-align: center; padding: 24px 0; }
+
+/* SAVE TOAST */
+.toast {
+  position: fixed; bottom: 30px; right: 30px;
+  background: #22c55e; color: white;
+  padding: 12px 22px; border-radius: 12px;
+  font-weight: 700; font-size: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  transform: translateY(80px); opacity: 0;
+  transition: all 0.3s; z-index: 9999;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* FULLSCREEN */
+#fs-overlay {
+  display: none; position: fixed; inset: 0; z-index: 99999;
+  background: #0d1117; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+#fs-overlay.active { display: flex; }
+.fs-subject { font-size: 20px; color: #9ca3af; margin-bottom: 16px; font-family: 'Manrope', sans-serif; }
+.fs-timer { font-size: 120px; font-weight: 800; color: white; margin-bottom: 16px; font-family: 'Manrope', sans-serif; }
+.fs-progress { width: 60%; max-width: 500px; height: 6px; background: #1f2937; border-radius: 99px; overflow: hidden; margin-bottom: 40px; }
+.fs-progress-fill { height: 100%; background: var(--orange); width: 100%; transition: width 0.5s linear; }
+.fs-btn-row { display: flex; gap: 14px; }
+.fs-btn { padding: 12px 30px; border: none; border-radius: 10px; background: #1f2937; color: white; cursor: pointer; font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600; }
+.fs-btn.primary { background: var(--orange); }
+.fs-stats { display: flex; gap: 40px; margin-top: 40px; }
+.fs-stat { text-align: center; }
+.fs-stat .fsl { color: #9ca3af; font-size: 13px; font-family: 'Manrope', sans-serif; }
+.fs-stat .fsv { color: white; font-size: 28px; font-weight: 800; margin-top: 6px; font-family: 'Manrope', sans-serif; }
+
+/* RESPONSIVE */
+@media(max-width:1000px) {
+  .content-grid { grid-template-columns: 1fr; }
+}
+@media(max-width:700px) {
+  body { flex-direction: column; overflow: auto; height: auto; }
+  .sidebar { width: 100%; min-width: 100%; }
+  .main { padding: 24px 18px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUDIO -->
+<audio id="digital-sound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"></audio>
+<audio id="soft-sound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+<audio id="alarm-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+<!-- FULLSCREEN -->
+<div id="fs-overlay">
+  <div class="fs-subject" id="fs-subject-display">Focus Session</div>
+  <div class="fs-timer" id="fs-timer-display">25:00</div>
+  <div class="fs-progress"><div class="fs-progress-fill" id="fs-fill"></div></div>
+  <div class="fs-btn-row">
+    <button class="fs-btn primary" id="fs-toggle-btn" onclick="toggleTimer()">Start</button>
+    <button class="fs-btn" onclick="resetTimer()">Reset</button>
+    <button class="fs-btn" onclick="exitFullscreen()">Exit Focus Mode</button>
+  </div>
+  <div class="fs-stats">
+    <div class="fs-stat"><div class="fsl">Pauses</div><div class="fsv" id="fs-pause">0</div></div>
+    <div class="fs-stat"><div class="fsl">Focus Score</div><div class="fsv" id="fs-focus">100%</div></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <a class="sidebar-logo" href="{{ url_for('home') }}">
+    <div class="logo-icon">🔥</div> StudyFlow
+  </a>
+  <ul class="nav-menu">
+    <li><a href="{{ url_for('dashboard') }}"><span class="nav-icon">⊞</span> Dashboard</a></li>
+    <li class="active"><a href="{{ url_for('pomodoro') }}"><span class="nav-icon">⏱</span> Pomodoro</a></li>
+    <li><a href="{{ url_for('todo') }}"><span class="nav-icon">☑</span> To-Do</a></li>
+    <li><a href="{{ url_for('timetable') }}"><span class="nav-icon">📅</span> Timetable</a></li>
+    <li><a href="{{ url_for('habits') }}"><span class="nav-icon">🔥</span> Habits</a></li>
+    <li><a href="{{ url_for('profile') }}"><span class="nav-icon">👤</span> Profile</a></li>
+  </ul>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="page-title">⏱️ Pomodoro Focus Session</div>
+
+  <div class="content-grid">
+
+    <!-- TIMER CARD -->
+    <div class="card">
+      <input type="text" id="subject" class="input" placeholder="Enter Subject / Topic">
+
+      <div class="input-row">
+        <input type="number" id="hours" class="input" value="0" min="0">
+        <input type="number" id="minutes-input" class="input" value="25" min="0" max="59">
+        <input type="number" id="seconds-input" class="input" value="0" min="0" max="59">
+      </div>
+      <div class="time-label"><span>Hours</span><span>Minutes</span><span>Seconds</span></div>
+
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+      <div class="timer" id="timer-display">25:00</div>
+
+      <div class="buttons">
+        <button class="btn btn-start" id="toggle-btn" onclick="toggleTimer()">Start</button>
+        <button class="btn btn-reset" onclick="resetTimer()">Reset</button>
+        <button class="btn btn-focus" onclick="enterFullscreen()">⛶ Focus Mode</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat-box"><span>Pauses</span><h3 id="pauseCount">0</h3></div>
+        <div class="stat-box"><span>Focus Score</span><h3 id="focusScore">100%</h3></div>
+      </div>
+
+      <!-- SOUND -->
+      <div class="sound-section">
+        <h3>🔔 Notification Sound</h3>
+        <div class="sound-grid">
+          <button class="sound-btn active" onclick="selectBuiltinSound('digital', this)">⏰ Digital</button>
+          <button class="sound-btn" onclick="selectBuiltinSound('soft', this)">🎵 Soft</button>
+          <button class="sound-btn" onclick="selectBuiltinSound('alarm', this)">🚨 Alarm</button>
+        </div>
+        <div class="upload-area">
+          <label class="upload-btn">
+            + Upload Audio
+            <input type="file" id="custom-audio" accept="audio/*" hidden>
+          </label>
+          <p id="audio-name">No custom audio selected</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY PANEL -->
+    <div class="card history-panel">
+      <h3>📋 Session History</h3>
+      <div id="history-list"><div class="empty-history">No sessions yet today.</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Session saved!</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCK339IcGf7kR6zegZUAz93GaCHbDTVbsI",
+  authDomain: "smart-study-planner-6bc26.firebaseapp.com",
+  projectId: "smart-study-planner-6bc26",
+  storageBucket: "smart-study-planner-6bc26.firebasestorage.app",
+  messagingSenderId: "536615775632",
+  appId: "1:536615775632:web:15f704b6c9d60a68435715"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = "/"; return; }
+  await fetch("/api/set_user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ uid: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email })
+  });
+  loadHistory();
+});
+
+window.logout = function(){
+  signOut(auth).then(() => { window.location.href = "/"; });
+};
+
+// ── History ────────────────────────────────────────────────────
+async function loadHistory(){
+  try {
+    const res  = await fetch("/api/pomodoro/history");
+    const data = await res.json();
+    const list = document.getElementById('history-list');
+    if(!data.length){
+      list.innerHTML = '<div class="empty-history">No sessions yet.<br>Complete a session to see it here!</div>';
+      return;
+    }
+    list.innerHTML = data.map(s => `
+      <div class="history-item">
+        <div>
+          <div class="history-subject">${s.subject || 'Focus Session'}</div>
+          <div class="history-meta">Pauses: ${s.pause_count} · Score: ${s.focus_score}%</div>
+          <div class="history-meta">${s.session_date}</div>
+        </div>
+        <div class="history-duration">${s.duration_mins}m</div>
+      </div>
+    `).join('');
+  } catch(e){ console.error(e); }
+}
+
+// ── Save session to SQLite ────────────────────────────────────
+window.saveSessionToDB = async function(durationMins, subject, pauseCount, focusScore){
+  try {
+    await fetch("/api/pomodoro/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subject:       subject,
+        duration_mins: durationMins,
+        pause_count:   pauseCount,
+        focus_score:   focusScore
+      })
+    });
+    showToast();
+    loadHistory();
+  } catch(e){ console.error(e); }
+};
+
+function showToast(){
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+</script>
+
+<script>
+// ── TIMER LOGIC ───────────────────────────────────────────────
+let timerInterval = null;
+let isRunning     = false;
+let remainingTime = 1500;
+let totalTime     = 1500;
+let pauseCount    = 0;
+let sessionStartTime = null;
+
+let selectedSound = 'digital';
+let customAudio   = null;
+
+function selectBuiltinSound(sound, el){
+  selectedSound = sound;
+  customAudio   = null;
+  document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('audio-name').textContent = 'No custom audio selected';
+}
+
+function playSound(){
+  if(customAudio){ customAudio.currentTime=0; customAudio.loop=true; customAudio.play(); return; }
+  const s = document.getElementById(selectedSound + '-sound');
+  s.currentTime=0; s.loop=true; s.play();
+}
+
+function stopSound(){
+  if(customAudio){ customAudio.pause(); customAudio.currentTime=0; customAudio.loop=false; }
+  ['digital-sound','soft-sound','alarm-sound'].forEach(id => {
+    const s = document.getElementById(id);
+    if(s){ s.pause(); s.currentTime=0; s.loop=false; }
+  });
+}
+
+document.getElementById('custom-audio').addEventListener('change', function(e){
+  const file = e.target.files[0]; if(!file) return;
+  customAudio = new Audio(URL.createObjectURL(file));
+  document.getElementById('audio-name').textContent = file.name;
+  document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+});
+
+function getTotalSeconds(){
+  const h = parseInt(document.getElementById('hours').value) || 0;
+  const m = parseInt(document.getElementById('minutes-input').value) || 0;
+  const s = parseInt(document.getElementById('seconds-input').value) || 0;
+  return h*3600 + m*60 + s;
+}
+
+function formatTime(sec){
+  const h = Math.floor(sec/3600);
+  const m = Math.floor((sec%3600)/60);
+  const s = sec%60;
+  if(h>0) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function updateDisplay(){
+  const time = formatTime(remainingTime);
+  document.getElementById('timer-display').textContent      = time;
+  document.getElementById('fs-timer-display').textContent   = time;
+  const pct = (remainingTime / totalTime) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('fs-fill').style.width       = pct + '%';
+  document.getElementById('fs-subject-display').textContent =
+    document.getElementById('subject').value || 'Focus Session';
+}
+
+function setRunningUI(running){
+  const txt = running ? 'Pause' : 'Start';
+  document.getElementById('toggle-btn').textContent    = txt;
+  document.getElementById('fs-toggle-btn').textContent = txt;
+}
+
+function toggleTimer(){ isRunning ? pauseTimer() : startTimer(); }
+
+function startTimer(){
+  if(!remainingTime){ totalTime = getTotalSeconds(); remainingTime = totalTime; }
+  if(!sessionStartTime) sessionStartTime = new Date();
+  isRunning = true;
+  setRunningUI(true);
+  timerInterval = setInterval(() => {
+    if(remainingTime > 0){ remainingTime--; updateDisplay(); }
+    else { completeSession(); }
+  }, 1000);
+}
+
+function pauseTimer(){
+  clearInterval(timerInterval); isRunning = false; pauseCount++;
+  document.getElementById('pauseCount').textContent   = pauseCount;
+  document.getElementById('fs-pause').textContent     = pauseCount;
+  const score = Math.max(0, 100 - pauseCount * 10);
+  document.getElementById('focusScore').textContent   = score + '%';
+  document.getElementById('fs-focus').textContent     = score + '%';
+  setRunningUI(false);
+}
+
+function resetTimer(){
+  clearInterval(timerInterval); isRunning = false;
+  totalTime = getTotalSeconds() || 1500;
+  remainingTime = totalTime; pauseCount = 0; sessionStartTime = null;
+  document.getElementById('pauseCount').textContent  = 0;
+  document.getElementById('fs-pause').textContent    = 0;
+  document.getElementById('focusScore').textContent  = '100%';
+  document.getElementById('fs-focus').textContent    = '100%';
+  setRunningUI(false); updateDisplay();
+}
+
+function completeSession(){
+  clearInterval(timerInterval); isRunning = false; setRunningUI(false);
+  playSound();
+
+  // ── SAVE TO SQLITE ──
+  const durationMins  = Math.round((totalTime - remainingTime) / 60) || Math.round(totalTime / 60);
+  const subject       = document.getElementById('subject').value || '';
+  const focusScore    = Math.max(0, 100 - pauseCount * 10);
+
+  if(typeof saveSessionToDB === 'function'){
+    saveSessionToDB(durationMins, subject, pauseCount, focusScore);
+  }
+
+  setTimeout(() => {
+    alert("🎉 Session Complete! Great work!");
+    stopSound();
+    resetTimer();
+  }, 100);
+}
+
+function enterFullscreen(){
+  const o = document.getElementById('fs-overlay');
+  o.classList.add('active'); updateDisplay();
+  if(o.requestFullscreen) o.requestFullscreen();
+  else if(o.webkitRequestFullscreen) o.webkitRequestFullscreen();
+}
+
+function exitFullscreen(){
+  if(document.fullscreenElement) document.exitFullscreen();
+  document.getElementById('fs-overlay').classList.remove('active');
+}
+
+document.addEventListener('fullscreenchange', () => {
+  if(!document.fullscreenElement) document.getElementById('fs-overlay').classList.remove('active');
+});
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') exitFullscreen(); });
+
+resetTimer();
+</script>
+
+</body>
+</html>

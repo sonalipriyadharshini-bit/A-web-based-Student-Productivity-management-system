@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>StudyFlow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --orange: #f5a623;
+    --orange-dark: #e8960f;
+    --green: #6ab04c;
+    --bg: #f0f2f7;
+    --white: #ffffff;
+    --text-dark: #1a1a2e;
+    --text-gray: #6b7280;
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 48px;
+    background: var(--white);
+    border-bottom: 1px solid #e8eaf0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-dark);
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--orange);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .nav-link {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-dark);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .nav-link:hover {
+    color: var(--orange);
+  }
+
+  .btn-primary {
+    background: var(--orange);
+    color: var(--white);
+    border: none;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background: var(--orange-dark);
+  }
+
+  /* HERO */
+  .hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 70px 48px 80px;
+    gap: 40px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .hero-left {
+    flex: 1;
+    max-width: 520px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #fff8ec;
+    border: 1px solid #fde68a;
+    color: #b45309;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 28px;
+  }
+
+  .badge-icon {
+    width: 18px;
+    height: 18px;
+    background: var(--orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+  }
+
+  .hero h1 {
+    font-size: 54px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  .hero h1 .orange {
+    color: var(--orange);
+  }
+
+  .hero h1 .green {
+    color: var(--green);
+  }
+
+  .hero-desc {
+    font-size: 17px;
+    color: var(--text-gray);
+    line-height: 1.7;
+    margin: 22px 0 36px;
+    max-width: 420px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .btn-outline {
+    background: var(--white);
+    color: var(--text-dark);
+    border: 1.5px solid #d1d5db;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--orange);
+  }
+
+  .hero-image {
+    flex: 1;
+    max-width: 560px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+  }
+
+  .hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* FEATURES SECTION */
+  .features {
+    background: #e8eaf0;
+    padding: 80px 48px;
+  }
+
+  .features-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .features-header {
+    text-align: center;
+    margin-bottom: 52px;
+  }
+
+  .features-header h2 {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+  }
+
+  .features-header p {
+    font-size: 16px;
+    color: var(--text-gray);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 36px 28px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+  }
+
+  .feature-icon {
+    width: 54px;
+    height: 54px;
+    background: var(--orange);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 22px;
+  }
+
+  .feature-card.highlight-card .feature-icon {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+  }
+
+  .feature-card.highlight-card {
+    border: 2px solid #ffe0b2;
+  }
+
+  .feature-card.highlight-card:hover {
+    border-color: #ff9800;
+    box-shadow: 0 8px 28px rgba(255,152,0,0.18);
+  }
+
+  .feature-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+  }
+
+  .feature-card p {
+    font-size: 14px;
+    color: var(--text-gray);
+    line-height: 1.6;
+  }
+
+  .feature-badge {
+    display: inline-block;
+    background: #fff3e0;
+    color: #ef6c00;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-top: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* RESPONSIVE */
+  @media(max-width: 1000px) {
+    .hero { flex-direction: column; text-align: center; }
+    .hero-left { max-width: 100%; }
+    .hero-desc { max-width: 100%; }
+    .hero-actions { justify-content: center; flex-wrap: wrap; }
+    .features-grid { grid-template-columns: repeat(2,1fr); }
+  }
+
+  @media(max-width: 700px) {
+    header { padding: 18px 22px; flex-direction: column; gap: 18px; }
+    .hero { padding: 50px 22px; }
+    .hero h1 { font-size: 40px; }
+    .features { padding: 60px 22px; }
+    .features-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+
+  <a class="logo" href="{{ url_for('dashboard') }}">
+    <div class="logo-icon">🔥</div>
+    StudyFlow
+  </a>
+
+  <div class="nav-right">
+    <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+    <a href="{{ url_for('todo') }}" class="nav-link">To-Do</a>
+    <a href="{{ url_for('pomodoro') }}" class="nav-link">Pomodoro</a>
+    <a href="{{ url_for('timetable') }}" class="nav-link">Timetable</a>
+
+    <a href="{{ url_for('dashboard') }}" class="btn-primary">
+      Get Started →
+    </a>
+  </div>
+
+</header>
+
+<!-- HERO -->
+<section class="hero">
+
+  <div class="hero-left">
+
+    <div class="badge">
+      <div class="badge-icon">📚</div>
+      Smart Study Management
+    </div>
+
+    <h1>
+      Organize Your<br>
+      <span class="orange">Study </span>
+      <span class="green">Life</span>
+    </h1>
+
+    <p class="hero-desc">
+      Plan your study sessions, manage daily tasks, stay focused with Pomodoro timers, build habits, and organize your timetable — all in one place.
+    </p>
+
+    <div class="hero-actions">
+      <a href="{{ url_for('dashboard') }}" class="btn-primary">
+        Start Planning →
+      </a>
+      <a href="{{ url_for('todo') }}" class="btn-outline">
+        Manage Tasks
+      </a>
+    </div>
+
+  </div>
+
+  <div class="hero-image">
+    <img
+      src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80"
+      alt="Study desk"
+      onerror="this.src='https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80'"
+    />
+  </div>
+
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+
+  <div class="features-inner">
+
+    <div class="features-header">
+      <h2>Everything You Need to Stay Productive</h2>
+      <p>Essential tools designed to help students stay organized and focused.</p>
+    </div>
+
+    <div class="features-grid">
+
+      <!-- DASHBOARD -->
+      <a href="{{ url_for('dashboard') }}" class="feature-card highlight-card">
+        <div class="feature-icon">📘</div>
+        <h3>Smart Study Dashboard</h3>
+        <p>Access your planner, tasks, habits, focus sessions, and timetable from one organized dashboard.</p>
+        <span class="feature-badge">ALL-IN-ONE WORKSPACE</span>
+      </a>
+
+      <!-- POMODORO -->
+      <a href="{{ url_for('pomodoro') }}" class="feature-card">
+        <div class="feature-icon">⏱️</div>
+        <h3>Pomodoro Timer</h3>
+        <p>Stay focused with customizable focus sessions and break timers.</p>
+      </a>
+
+      <!-- TODO -->
+      <a href="{{ url_for('todo') }}" class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>Smart To-Do</h3>
+        <p>Track tasks with priorities, deadlines, and daily progress updates.</p>
+      </a>
+
+      <!-- TIMETABLE -->
+      <a href="{{ url_for('timetable') }}" class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Timetable Builder</h3>
+        <p>Create and manage your weekly study timetable easily.</p>
+      </a>
+
+      <!-- HABIT -->
+      <a href="{{ url_for('habits') }}" class="feature-card">
+        <div class="feature-icon">🔥</div>
+        <h3>Habit Tracker</h3>
+        <p>Build consistent study habits and maintain productive streaks.</p>
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+</body>
+</html>

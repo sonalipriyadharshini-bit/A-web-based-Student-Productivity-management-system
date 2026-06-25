@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Smart Study Planner</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+            url("https://images.unsplash.com/photo-1501504905252-473c47e087f8") no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 380px;
+            padding: 40px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            text-align: center;
+            color: white;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: none;
+            background: #4facfe;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .google-btn {
+            background: #db4437;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>📚 Smart Study Planner</h1>
+
+    <input type="email" id="email" placeholder="Enter Email">
+    <input type="password" id="password" placeholder="Enter Password">
+
+    <button onclick="login()">Login</button>
+    <button class="google-btn" onclick="googleLogin()">Continue with Google</button>
+
+    <br><br>
+    <a href="/register">Don't have an account? Register</a>
+</div>
+
+<!-- 🔥 FIREBASE SCRIPT START -->
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    GoogleAuthProvider, 
+    signInWithPopup,
+    setPersistence,
+    browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCK339IcGf7kR6zegZUAz93GaCHbDTVbsI",
+  authDomain: "smart-study-planner-6bc26.firebaseapp.com",
+  projectId: "smart-study-planner-6bc26",
+  storageBucket: "smart-study-planner-6bc26.firebasestorage.app",
+  messagingSenderId: "536615775632",
+  appId: "1:536615775632:web:15f704b6c9d60a68435715"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// ✅ IMPORTANT FIX — This keeps user logged in
+setPersistence(auth, browserLocalPersistence);
+
+window.login = function() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+        alert("Login Successful!");
+        window.location.href = "/home";
+    })
+    .catch((error) => {
+        alert(error.message);
+    });
+}
+
+window.googleLogin = function() {
+    const provider = new GoogleAuthProvider();
+
+    signInWithPopup(auth, provider)
+    .then((result) => {
+        alert("Google Login Successful!");
+        window.location.href = "/home";
+    })
+    .catch((error) => {
+        alert(error.message);
+    });
+}
+
+</script>
+
+<!-- 🔥 FIREBASE SCRIPT END -->
+
+</body>
+</html>

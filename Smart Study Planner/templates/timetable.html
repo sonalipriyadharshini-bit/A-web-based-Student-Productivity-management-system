@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Timetable</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #F3F4F6;
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #111827;
+      padding: 32px 40px;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #111827;
+    }
+    .header p {
+      font-size: 14px;
+      color: #6B7280;
+      margin-top: 4px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-export {
+      background: #fff;
+      border: 1.5px solid #D1D5DB;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-export:hover { background: #F9FAFB; }
+    .btn-add-class {
+      background: #F59E0B;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+    }
+    .btn-add-class:hover { background: #D97706; }
+
+    /* INPUT CARD */
+    .input-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      flex-wrap: wrap;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 120px;
+    }
+    .input-group.subject { flex: 3; }
+    .input-group.location { flex: 2; }
+    .input-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6B7280;
+      letter-spacing: 0.02em;
+    }
+    .input-group select,
+    .input-group input[type="time"],
+    .input-group input[type="text"] {
+      border: 1.5px solid #E5E7EB;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: #111827;
+      background: #fff;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+    }
+    .input-group select:focus,
+    .input-group input:focus {
+      border-color: #F59E0B;
+    }
+    .btn-add {
+      background: #F59E0B;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+    .btn-add:hover { background: #D97706; }
+
+    /* SCHEDULE */
+    .schedule-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .day-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px 28px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .day-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #F59E0B;
+      margin-bottom: 16px;
+    }
+    .empty-note {
+      font-size: 13px;
+      color: #9CA3AF;
+    }
+    .class-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .class-row:last-child { margin-bottom: 0; }
+    .class-time {
+      font-size: 13px;
+      color: #6B7280;
+      font-variant-numeric: tabular-nums;
+      min-width: 44px;
+    }
+    .class-bar {
+      width: 3px;
+      height: 36px;
+      border-radius: 4px;
+      background: #F59E0B;
+      flex-shrink: 0;
+    }
+    .class-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+    .class-subject {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .class-location {
+      font-size: 12px;
+      color: #6B7280;
+    }
+    .btn-delete {
+      background: none;
+      border: none;
+      color: #D1D5DB;
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+      border-radius: 6px;
+      opacity: 0;
+      transition: color 0.15s, opacity 0.15s;
+    }
+    .class-row:hover .btn-delete { opacity: 1; }
+    .btn-delete:hover { color: #EF4444; }
+
+    @media (max-width: 640px) {
+      body { padding: 20px 16px; }
+      .input-card { flex-direction: column; }
+      .input-group { min-width: 100%; }
+      .btn-add { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <h1>Timetable</h1>
+      <p>Plan your weekly schedule</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-export" onclick="exportTimetable()">
+        &#8595; Export
+      </button>
+      <button class="btn-add-class" onclick="document.getElementById('subjectInput').focus()">
+        + Add Class
+      </button>
+    </div>
+  </div>
+
+  <!-- INPUT CARD -->
+  <div class="input-card">
+    <div class="input-group">
+      <label>Day</label>
+      <select id="daySelect">
+        <option>Monday</option>
+        <option>Tuesday</option>
+        <option>Wednesday</option>
+        <option>Thursday</option>
+        <option>Friday</option>
+        <option>Saturday</option>
+        <option>Sunday</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Time</label>
+      <input type="time" id="timeInput" value="09:00" />
+    </div>
+    <div class="input-group subject">
+      <label>Subject</label>
+      <input type="text" id="subjectInput" placeholder="Subject name" onkeydown="if(event.key==='Enter') addClass()" />
+    </div>
+    <div class="input-group location">
+      <label>Location</label>
+      <input type="text" id="locationInput" placeholder="Room/Lab" onkeydown="if(event.key==='Enter') addClass()" />
+    </div>
+    <button class="btn-add" onclick="addClass()">Add</button>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="schedule-list" id="scheduleList"></div>
+
+  <script>
+    const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+    const schedule = {
+      Monday: [
+        { id: 1, time: "09:00", subject: "Mathematics", location: "Room 101" },
+        { id: 2, time: "11:00", subject: "Physics", location: "Lab A" },
+      ],
+      Tuesday: [
+        { id: 3, time: "09:00", subject: "Chemistry", location: "Lab B" },
+        { id: 4, time: "14:00", subject: "English", location: "Room 204" },
+      ],
+      Wednesday: [], Thursday: [], Friday: [], Saturday: [], Sunday: [],
+    };
+
+    let nextId = 10;
+
+    function formatTime(t) {
+      const [h, m] = t.split(":").map(Number);
+      const suffix = h >= 12 ? "PM" : "AM";
+      const hour = h % 12 || 12;
+      return `${hour}:${String(m).padStart(2,"0")} ${suffix}`;
+    }
+
+    function render() {
+      const list = document.getElementById("scheduleList");
+      list.innerHTML = "";
+      DAYS.forEach(day => {
+        const classes = schedule[day] || [];
+        const card = document.createElement("div");
+        card.className = "day-card";
+
+        const title = document.createElement("h2");
+        title.className = "day-title";
+        title.textContent = day;
+        card.appendChild(title);
+
+        if (classes.length === 0) {
+          const empty = document.createElement("p");
+          empty.className = "empty-note";
+          empty.textContent = "No classes scheduled";
+          card.appendChild(empty);
+        } else {
+          classes.forEach(cls => {
+            const row = document.createElement("div");
+            row.className = "class-row";
+
+            const time = document.createElement("span");
+            time.className = "class-time";
+            time.textContent = cls.time;
+
+            const bar = document.createElement("div");
+            bar.className = "class-bar";
+
+            const info = document.createElement("div");
+            info.className = "class-info";
+            info.innerHTML = `<span class="class-subject">${cls.subject}</span><span class="class-location">${cls.location}</span>`;
+
+            const del = document.createElement("button");
+            del.className = "btn-delete";
+            del.innerHTML = "&times;";
+            del.title = "Remove";
+            del.onclick = () => deleteClass(day, cls.id);
+
+            row.appendChild(time);
+            row.appendChild(bar);
+            row.appendChild(info);
+            row.appendChild(del);
+            card.appendChild(row);
+          });
+        }
+        list.appendChild(card);
+      });
+    }
+
+    function addClass() {
+      const day = document.getElementById("daySelect").value;
+      const time = document.getElementById("timeInput").value;
+      const subject = document.getElementById("subjectInput").value.trim();
+      const location = document.getElementById("locationInput").value.trim();
+      if (!subject) { document.getElementById("subjectInput").focus(); return; }
+      schedule[day].push({ id: nextId++, time, subject, location });
+      schedule[day].sort((a, b) => a.time.localeCompare(b.time));
+      document.getElementById("subjectInput").value = "";
+      document.getElementById("locationInput").value = "";
+      render();
+    }
+
+    function deleteClass(day, id) {
+      schedule[day] = schedule[day].filter(c => c.id !== id);
+      render();
+    }
+
+    function exportTimetable() {
+      let text = "TIMETABLE\n" + "=".repeat(40) + "\n";
+      DAYS.forEach(day => {
+        if (schedule[day]?.length) {
+          text += `\n${day}\n`;
+          schedule[day].forEach(c => {
+            text += `  ${formatTime(c.time)}  |  ${c.subject}  |  ${c.location}\n`;
+          });
+        }
+      });
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = "timetable.txt"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    render();
+  </script>
+</body>
+</html>

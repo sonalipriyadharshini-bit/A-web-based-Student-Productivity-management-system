@@ -1,0 +1,17 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCK339IcGf7kR6zegZUAz93GaCHbDTVbsI",
+  authDomain: "smart-study-planner-6bc26.firebaseapp.com",
+  projectId: "smart-study-planner-6bc26",
+  storageBucket: "smart-study-planner-6bc26.firebasestorage.app",
+  messagingSenderId: "536615775632",
+  appId: "1:536615775632:web:15f704b6c9d60a68435715"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);

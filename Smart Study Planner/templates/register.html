@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - Smart Study Planner</title>
+
+    <style>
+
+        body{
+            margin:0;
+            padding:0;
+
+            height:100vh;
+
+            background-image:url("https://images.unsplash.com/photo-1498050108023-c5249f4df085");
+            background-size:cover;
+            background-position:center;
+            background-repeat:no-repeat;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            font-family:Arial, sans-serif;
+        }
+
+        body::before{
+            content:"";
+            position:absolute;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.45);
+        }
+
+        .register-box{
+            position:relative;
+
+            width:380px;
+
+            padding:40px;
+
+            background:rgba(255,255,255,0.15);
+
+            border-radius:20px;
+
+            backdrop-filter:blur(8px);
+
+            text-align:center;
+
+            color:white;
+        }
+
+        h1{
+            font-size:45px;
+            margin-bottom:30px;
+        }
+
+        input{
+            width:100%;
+
+            padding:15px;
+
+            margin-top:15px;
+
+            border:none;
+            border-radius:10px;
+
+            font-size:16px;
+        }
+
+        button{
+            width:100%;
+
+            padding:15px;
+
+            margin-top:20px;
+
+            border:none;
+            border-radius:10px;
+
+            background:#4da3ff;
+
+            color:white;
+
+            font-size:18px;
+
+            cursor:pointer;
+        }
+
+        a{
+            color:white;
+            text-decoration:none;
+            font-size:18px;
+        }
+
+        p{
+            margin-top:25px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="register-box">
+
+    <h1>📚 Smart Study Planner</h1>
+
+    <input type="email" id="email" placeholder="Enter Email">
+
+    <input type="password" id="password" placeholder="Enter Password">
+
+    <button onclick="register()">
+        Register
+    </button>
+
+    <p>
+        <a href="/">
+            Already have an account? Login
+        </a>
+    </p>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getAuth,
+    createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCK339IcGf7kR6zegZUAz93GaCHbDTVbsI",
+  authDomain: "smart-study-planner-6bc26.firebaseapp.com",
+  projectId: "smart-study-planner-6bc26",
+  storageBucket: "smart-study-planner-6bc26.firebasestorage.app",
+  messagingSenderId: "536615775632",
+  appId: "1:536615775632:web:15f704b6c9d60a68435715"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+window.register = function() {
+
+    const email = document.getElementById("email").value;
+
+    const password = document.getElementById("password").value;
+
+    createUserWithEmailAndPassword(auth, email, password)
+
+    .then((userCredential) => {
+
+        alert("Registration Successful!");
+
+        window.location.href = "/";
+
+    })
+
+    .catch((error) => {
+
+        alert(error.message);
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
